@@ -16,8 +16,11 @@ for lines in lines:
     current_path = '../Data/IMG/' + filename
     image = cv2.imread(current_path)
     images.append(image)
+    images.append(np.fliplr(image))
+
     measurement = float(line[3])
     measurements.append(measurement)
+    measurements.append(measurement*-1.0)
 
 X_train = np.array(images)
 y_train = np.array(measurements)
@@ -28,7 +31,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 model = Sequential()
-model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
+model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160,320,3)))
 
 model.add(Convolution2D(6,5,5,activation="relu"))
 model.add(MaxPooling2D())
