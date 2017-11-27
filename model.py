@@ -31,7 +31,7 @@ from keras.layers.convolutional import Conv2D, Cropping2D
 
 model = Sequential()
 model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160, 320, 3)))
-model.add(Cropping2D(cropping=((70, 25), (0, 0))))
+#model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
 model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
