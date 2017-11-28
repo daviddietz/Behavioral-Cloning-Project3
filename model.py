@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 lines = []
-with open('../Data/archivedData/dataSet2/driving_log.csv') as csvfile:
+with open('../Data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -22,7 +22,7 @@ for line in lines:
             measurement = measurement - correction
         source_path = line[i]
         filename = source_path.split('/')[-1]
-        current_path = '../Data/archivedData/dataSet2/IMG/' + filename
+        current_path = '../Data/IMG/' + filename
         image = cv2.imread(current_path)
 
         images.append(image)
