@@ -78,7 +78,7 @@ model.add(Dense(10))
 model.add(Dense(1))
 print("Training images: {0}".format(len(validation_image_samples)))
 model.compile(loss='mse', optimizer='adam')
-history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples)/32, validation_data=validation_generator, validation_steps=len(validation_image_samples)/32, epochs=2, verbose=1)
+history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples)/32, validation_data=validation_generator, validation_steps=len(validation_image_samples)/32, epochs=5, verbose=1)
 
 model.save('model.h5')
 
