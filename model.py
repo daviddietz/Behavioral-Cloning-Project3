@@ -37,7 +37,7 @@ def generator(samples, batch_size=32):
                 for i in range(3):
                     measurement = float(batch_image[3])
                     correction = 0.25
-                    if i == 1:
+                    if i == 0:
                         # Apply correction to left image
                         measurement = measurement + correction
                     if i == 2:
@@ -55,9 +55,9 @@ def generator(samples, batch_size=32):
                     images.append(np.fliplr(image))
                     measurements.append(-measurement)
 
-            X_train = np.array(images)
+            x_train = np.array(images)
             y_train = np.array(measurements)
-            yield shuffle(X_train, y_train)
+            yield shuffle(x_train, y_train)
 
 
 train_generator = generator(train_image_samples, batch_size=32)
@@ -83,7 +83,7 @@ model.add(Dense(512))
 model.add(Dense(64))
 model.add(Dense(16))
 model.add(Dense(1))
-print("Training images: {0}".format(len(validation_image_samples)))
+print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mse', optimizer='adam')
 history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples)/32, validation_data=validation_generator, validation_steps=len(validation_image_samples)/32, epochs=3, verbose=1)
 
