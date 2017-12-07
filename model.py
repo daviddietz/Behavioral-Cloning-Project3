@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
 sample_images = []
-with open('../Data/driving_log.csv') as csvfile:
+with open('../Data/archivedData/dataSet4Small/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         sample_images.append(line)
@@ -45,7 +45,7 @@ def generator(samples, batch_size=32):
                         measurement = measurement - correction
                     source_path = line[i]
                     filename = source_path.split('/')[-1]
-                    current_path = '../Data/IMG/' + filename
+                    current_path = '../Data/archivedData/dataSet4Small/IMG/' + filename
                     image = cv2.imread(current_path)
                     #image = preProcessImage(image)
 
@@ -64,7 +64,7 @@ train_generator = generator(train_image_samples, batch_size=32)
 validation_generator = generator(validation_image_samples, batch_size=32)
 
 model = Sequential()
-model.add(Lambda(lambda x: (x / 255) - 0.5, input_shape=(160, 320, 3)))
+model.add(Lambda(lambda x: (x / 127.5) - 1, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((32, 20), (0, 0))))
 model.add(Conv2D(24, (3, 3), activation="relu"))
 model.add(Conv2D(24, (3, 3), activation="relu"))
@@ -85,7 +85,7 @@ model.add(Dense(16))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mse', optimizer='adam')
-history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples)/32, validation_data=validation_generator, validation_steps=len(validation_image_samples)/32, epochs=3, verbose=1)
+history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples)/32, validation_data=validation_generator, validation_steps=len(validation_image_samples)/32, epochs=2, verbose=1)
 
 model.save('model.h5')
 
