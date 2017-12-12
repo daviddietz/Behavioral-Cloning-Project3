@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
 sample_images = []
-with open('../Data/archivedData/dataSet4Small/driving_log.csv') as csvfile:
+with open('../Data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         sample_images.append(line)
@@ -45,7 +45,7 @@ def generator(samples, batch_size=32):
                         measurement = measurement - correction
                     source_path = line[i]
                     filename = source_path.split('/')[-1]
-                    current_path = '../Data/archivedData/dataSet4Small/IMG/' + filename
+                    current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
                     #image = preProcessImage(image)
 
