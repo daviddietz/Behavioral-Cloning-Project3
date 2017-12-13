@@ -16,6 +16,7 @@ with open('../Data/driving_log.csv') as csvfile:
 
 train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.2)
 
+
 def preProcessImage(image):
     shape = image.shape
     image = image[np.math.floor(shape[0] / 5):shape[0] - 25, 0:shape[1]]
@@ -47,7 +48,7 @@ def generator(samples, batch_size=32):
                     filename = source_path.split('/')[-1]
                     current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
-                    #image = preProcessImage(image)
+                    # image = preProcessImage(image)
 
                     images.append(image)
                     measurements.append(measurement)
@@ -69,8 +70,8 @@ model.add(Cropping2D(cropping=((50, 20), (0, 0))))
 model.add(Conv2D(24, (5, 5), subsample=(2, 2), activation="relu"))
 model.add(Conv2D(36, (5, 5), subsample=(2, 2), activation="relu"))
 model.add(Conv2D(48, (5, 5), subsample=(2, 2), activation="relu"))
-#model.add(MaxPooling2D(pool_size=(1, 1), strides=None, padding='valid', data_format=None))
-#model.add(Dropout(0.5))
+# model.add(MaxPooling2D(pool_size=(1, 1), strides=None, padding='valid', data_format=None))
+# model.add(Dropout(0.5))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
@@ -79,20 +80,22 @@ model.add(Dense(50))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mse', optimizer='adam')
-history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples)/32, validation_data=validation_generator, validation_steps=len(validation_image_samples)/32, epochs=3, verbose=1)
+history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / 32,
+                                     validation_data=validation_generator,
+                                     validation_steps=len(validation_image_samples) / 32, epochs=3, verbose=1)
 
 model.save('model.h5')
 
 ### print the keys contained in the history object
-#print(history_object.history.keys())
+# print(history_object.history.keys())
 
 ### plot the training and validation loss for each epoch
-#plt.plot(history_object.history['loss'])
-#plt.plot(history_object.history['val_loss'])
-#plt.title('model mean squared error loss')
-#plt.ylabel('mean squared error loss')
-#plt.xlabel('epoch')
-#plt.legend(['training set', 'validation set'], loc='upper right')
-#plt.show()
+# plt.plot(history_object.history['loss'])
+# plt.plot(history_object.history['val_loss'])
+# plt.title('model mean squared error loss')
+# plt.ylabel('mean squared error loss')
+# plt.xlabel('epoch')
+# plt.legend(['training set', 'validation set'], loc='upper right')
+# plt.show()
 
 exit()
