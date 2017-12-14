@@ -4,7 +4,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Dropout, MaxPooling2D
 from keras.layers.convolutional import Conv2D, Cropping2D
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
