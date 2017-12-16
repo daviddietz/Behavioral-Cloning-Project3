@@ -37,8 +37,8 @@ def generator(samples, batch_size=32):
             for batch_image in batch_images:
                 for i in range(3):
                     measurement = float(batch_image[3])
-                    correction = 0.25
-                    if i == 0:
+                    correction = 0.20
+                    if i == 1:
                         # Apply correction to left image
                         measurement = measurement + correction
                     if i == 2:
