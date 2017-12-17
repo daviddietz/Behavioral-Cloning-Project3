@@ -4,9 +4,10 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Dropout, MaxPooling2D
 from keras.layers.convolutional import Conv2D, Cropping2D
-#import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+import random
 
 sample_images = []
 with open('../Data/driving_log.csv') as csvfile:
@@ -15,13 +16,7 @@ with open('../Data/driving_log.csv') as csvfile:
         sample_images.append(line)
 
 train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.2)
-BATCH_SIZE = 128
-
-def preProcessImage(image):
-    shape = image.shape
-    image = image[np.math.floor(shape[0] / 5):shape[0] - 25, 0:shape[1]]
-    image = (image / 127.5) - 1
-    return image
+BATCH_SIZE = 64
 
 
 def generator(samples, batch_size=BATCH_SIZE):
@@ -37,7 +32,11 @@ def generator(samples, batch_size=BATCH_SIZE):
             for batch_image in batch_images:
                 for i in range(3):
                     measurement = float(batch_image[3])
-                    correction = 0.25
+                    if measurement == 0.00:
+                        keep_prob = bool(random.getrandbits(1))
+                        if keep_prob:
+                            continue
+                    correction = 0.20
                     if i == 1:
                         # Apply correction to left image
                         measurement = measurement + correction
@@ -48,7 +47,7 @@ def generator(samples, batch_size=BATCH_SIZE):
                     filename = source_path.split('/')[-1]
                     current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
-                    # image = preProcessImage(image)
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
                     images.append(image)
                     measurements.append(measurement)
@@ -70,19 +69,19 @@ model.add(Cropping2D(cropping=((50, 20), (0, 0))))
 model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(48, (5, 5), strides=(2, 2), activation="relu"))
-# model.add(MaxPooling2D(pool_size=(1, 1), strides=None, padding='valid', data_format=None))
-model.add(Dropout(0.5))
+model.add(MaxPooling2D(pool_size=(1, 1), strides=None, padding='valid', data_format=None))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
 model.add(Dense(100))
+model.add(Dropout(0.5))
 model.add(Dense(50))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
-model.compile(loss='mse', optimizer='adam')
+model.compile(loss='mae', optimizer='adam')
 history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / BATCH_SIZE,
                                      validation_data=validation_generator,
-                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=3, verbose=1)
+                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=15, verbose=1)
 
 model.save('model.h5')
 
