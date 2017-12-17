@@ -15,7 +15,7 @@ with open('../Data/driving_log.csv') as csvfile:
         sample_images.append(line)
 
 train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.2)
-
+BATCH_SIZE = 128
 
 def preProcessImage(image):
     shape = image.shape
@@ -24,7 +24,7 @@ def preProcessImage(image):
     return image
 
 
-def generator(samples, batch_size=32):
+def generator(samples, batch_size=BATCH_SIZE):
     num_images = len(samples)
     while 1:
         shuffle(samples)
@@ -37,7 +37,7 @@ def generator(samples, batch_size=32):
             for batch_image in batch_images:
                 for i in range(3):
                     measurement = float(batch_image[3])
-                    correction = 0.20
+                    correction = 0.25
                     if i == 1:
                         # Apply correction to left image
                         measurement = measurement + correction
@@ -61,17 +61,17 @@ def generator(samples, batch_size=32):
             yield shuffle(x_train, y_train)
 
 
-train_generator = generator(train_image_samples, batch_size=32)
-validation_generator = generator(validation_image_samples, batch_size=32)
+train_generator = generator(train_image_samples, batch_size=BATCH_SIZE)
+validation_generator = generator(validation_image_samples, batch_size=BATCH_SIZE)
 
 model = Sequential()
 model.add(Lambda(lambda x: (x / 255) - 0.5, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((50, 20), (0, 0))))
-model.add(Conv2D(24, (5, 5), subsample=(2, 2), activation="relu"))
-model.add(Conv2D(36, (5, 5), subsample=(2, 2), activation="relu"))
-model.add(Conv2D(48, (5, 5), subsample=(2, 2), activation="relu"))
+model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
+model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
+model.add(Conv2D(48, (5, 5), strides=(2, 2), activation="relu"))
 # model.add(MaxPooling2D(pool_size=(1, 1), strides=None, padding='valid', data_format=None))
-# model.add(Dropout(0.5))
+model.add(Dropout(0.5))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
@@ -80,9 +80,9 @@ model.add(Dense(50))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mse', optimizer='adam')
-history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / 32,
+history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / BATCH_SIZE,
                                      validation_data=validation_generator,
-                                     validation_steps=len(validation_image_samples) / 32, epochs=3, verbose=1)
+                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=3, verbose=1)
 
 model.save('model.h5')
 
