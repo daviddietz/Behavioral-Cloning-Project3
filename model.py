@@ -32,10 +32,9 @@ def generator(samples, batch_size=BATCH_SIZE):
             for batch_image in batch_images:
                 for i in range(3):
                     measurement = float(batch_image[3])
+                    keep_prob = 0
                     if measurement == 0.00:
                         keep_prob = randint(0, 4)
-                        if keep_prob == 1:
-                            continue
                     correction = 0.20
                     if i == 1:
                         # Apply correction to left image
@@ -48,7 +47,8 @@ def generator(samples, batch_size=BATCH_SIZE):
                     current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
                     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
+                    if keep_prob == 1:
+                        continue
                     images.append(image)
                     measurements.append(measurement)
 
@@ -81,7 +81,7 @@ print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mae', optimizer='adam')
 history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / BATCH_SIZE,
                                      validation_data=validation_generator,
-                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=10, verbose=1)
+                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=15, verbose=1)
 
 model.save('model.h5')
 
