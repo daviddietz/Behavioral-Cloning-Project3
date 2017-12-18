@@ -15,7 +15,7 @@ with open('../Data/driving_log.csv') as csvfile:
     for line in reader:
         sample_images.append(line)
 
-train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.15)
+train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.20)
 BATCH_SIZE = 64
 
 
@@ -32,9 +32,10 @@ def generator(samples, batch_size=BATCH_SIZE):
             for batch_image in batch_images:
                 for i in range(3):
                     measurement = float(batch_image[3])
-                    keep_prob = 0
                     if measurement == 0.00:
                         keep_prob = randint(0, 4)
+                        if keep_prob == 1:
+                            continue
                     correction = 0.20
                     if i == 1:
                         # Apply correction to left image
@@ -47,8 +48,7 @@ def generator(samples, batch_size=BATCH_SIZE):
                     current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
                     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    if keep_prob == 1:
-                        continue
+
                     images.append(image)
                     measurements.append(measurement)
 
@@ -74,7 +74,7 @@ model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
 model.add(Dense(100))
-model.add(Dropout(0.5))
+#model.add(Dropout(0.5))
 model.add(Dense(50))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
