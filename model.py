@@ -32,10 +32,10 @@ def generator(samples, batch_size=BATCH_SIZE):
             for batch_image in batch_images:
                 for i in range(3):
                     measurement = float(batch_image[3])
-                    if measurement == 0.00:
-                        keep_prob = randint(0, 4)
-                        if keep_prob == 1:
-                            continue
+                    # if measurement == 0.00:
+                    #     keep_prob = randint(0, 4)
+                    #     if keep_prob == 1:
+                    #         continue
                     correction = 0.20
                     if i == 1:
                         # Apply correction to left image
@@ -68,14 +68,15 @@ model.add(Lambda(lambda x: (x / 255) - 0.5, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
-model.add(Conv2D(48, (5, 5), strides=(2, 2), activation="relu"))
-#model.add(MaxPooling2D(pool_size=(1, 1), strides=None, padding='valid', data_format=None))
-model.add(Conv2D(64, (3, 3), activation="relu"))
-model.add(Conv2D(64, (3, 3), activation="relu"))
+model.add(Conv2D(64, (5, 5), strides=(2, 2), activation="relu"))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+# model.add(Conv2D(64, (3, 3), activation="relu"))
+# model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
+model.add(Dropout(0.5))
 model.add(Dense(100))
-#model.add(Dropout(0.5))
 model.add(Dense(50))
+model.add(Dropout(0.4))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mae', optimizer='adam')
