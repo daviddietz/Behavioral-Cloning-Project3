@@ -16,7 +16,7 @@ with open('../Data/driving_log.csv') as csvfile:
         sample_images.append(line)
 
 train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.20)
-BATCH_SIZE = 64
+BATCH_SIZE = 256
 
 
 def generator(samples, batch_size=BATCH_SIZE):
