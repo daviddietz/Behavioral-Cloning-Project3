@@ -15,8 +15,8 @@ with open('../Data/driving_log.csv') as csvfile:
     for line in reader:
         sample_images.append(line)
 
-train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.20)
-BATCH_SIZE = 128
+train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.15)
+BATCH_SIZE = 64
 
 
 def generator(samples, batch_size=BATCH_SIZE):
@@ -32,10 +32,10 @@ def generator(samples, batch_size=BATCH_SIZE):
             for batch_sample in batch_samples:
                 for image in range(3):
                     measurement = float(batch_sample[3])
-                    if measurement == 0.00:
-                        keep_prob = randint(0, 3)
-                        if keep_prob == 1:
-                            continue
+                    # if measurement == 0.00:
+                    #     keep_prob = randint(0, 3)
+                    #     if keep_prob == 1:
+                    #         continue
                     correction = 0.25
                     if image == 1:
                         # Apply correction to left image
@@ -69,17 +69,17 @@ model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(48, (5, 5), strides=(2, 2), activation="relu"))
-#model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
-model.add(Conv2D(64, (3, 3), activation="relu"))
-model.add(Conv2D(64, (3, 3), activation="relu"))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+# model.add(Conv2D(64, (3, 3), activation="relu"))
+# model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
 model.add(Dropout(0.5))
-model.add(Dense(100))
-model.add(Dense(50))
-model.add(Dropout(0.5))
-model.add(Dense(1))
+model.add(Dense(units=100))
+model.add(Dense(units=50))
+#model.add(Dropout(0.5))
+model.add(Dense(units=1))
 print("Training images: {0}".format(len(train_image_samples)))
-model.compile(loss='mae', optimizer='adam')
+model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / BATCH_SIZE,
                                      validation_data=validation_generator,
                                      validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=15, verbose=1)
