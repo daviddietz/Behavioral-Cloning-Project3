@@ -16,7 +16,7 @@ with open('../Data/driving_log.csv') as csvfile:
         sample_images.append(line)
 
 train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.20)
-BATCH_SIZE = 256
+BATCH_SIZE = 64
 
 
 def generator(samples, batch_size=BATCH_SIZE):
@@ -24,26 +24,26 @@ def generator(samples, batch_size=BATCH_SIZE):
     while 1:
         shuffle(samples)
         for offset in range(0, num_images, batch_size):
-            batch_images = samples[offset:offset + batch_size]
+            batch_samples = samples[offset:offset + batch_size]
 
             images = []
             measurements = []
 
-            for batch_image in batch_images:
-                for i in range(3):
-                    measurement = float(batch_image[3])
+            for batch_sample in batch_samples:
+                for image in range(3):
+                    measurement = float(batch_sample[3])
                     # if measurement == 0.00:
                     #     keep_prob = randint(0, 4)
                     #     if keep_prob == 1:
                     #         continue
-                    correction = 0.20
-                    if i == 1:
+                    correction = 0.25
+                    if image == 1:
                         # Apply correction to left image
                         measurement = measurement + correction
-                    if i == 2:
+                    if image == 2:
                         # Apply correction to right image
                         measurement = measurement - correction
-                    source_path = line[i]
+                    source_path = line[image]
                     filename = source_path.split('/')[-1]
                     current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
@@ -68,15 +68,15 @@ model.add(Lambda(lambda x: (x / 255) - 0.5, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
 model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
-model.add(Conv2D(64, (5, 5), strides=(2, 2), activation="relu"))
-model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
-# model.add(Conv2D(64, (3, 3), activation="relu"))
-# model.add(Conv2D(64, (3, 3), activation="relu"))
+model.add(Conv2D(48, (5, 5), strides=(2, 2), activation="relu"))
+#model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+model.add(Conv2D(64, (3, 3), activation="relu"))
+model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
 model.add(Dropout(0.5))
 model.add(Dense(100))
 model.add(Dense(50))
-model.add(Dropout(0.4))
+#model.add(Dropout(0.4))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mae', optimizer='adam')
