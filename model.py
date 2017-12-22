@@ -16,7 +16,7 @@ with open('../Data/driving_log.csv') as csvfile:
         sample_images.append(line)
 
 train_image_samples, validation_image_samples = train_test_split(sample_images, test_size=0.20)
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 
 
 def generator(samples, batch_size=BATCH_SIZE):
@@ -32,10 +32,10 @@ def generator(samples, batch_size=BATCH_SIZE):
             for batch_sample in batch_samples:
                 for image in range(3):
                     measurement = float(batch_sample[3])
-                    # if measurement == 0.00:
-                    #     keep_prob = randint(0, 4)
-                    #     if keep_prob == 1:
-                    #         continue
+                    if measurement == 0.00:
+                        keep_prob = randint(0, 3)
+                        if keep_prob == 1:
+                            continue
                     correction = 0.25
                     if image == 1:
                         # Apply correction to left image
@@ -76,7 +76,7 @@ model.add(Flatten())
 model.add(Dropout(0.5))
 model.add(Dense(100))
 model.add(Dense(50))
-#model.add(Dropout(0.4))
+model.add(Dropout(0.5))
 model.add(Dense(1))
 print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mae', optimizer='adam')
