@@ -83,7 +83,7 @@ print("Training images: {0}".format(len(train_image_samples)))
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 history_object = model.fit_generator(train_generator, steps_per_epoch=len(train_image_samples) / BATCH_SIZE,
                                      validation_data=validation_generator,
-                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=10, verbose=1, shuffle=True)
+                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=10, verbose=0)
 
 model.save('model.h5')
 
