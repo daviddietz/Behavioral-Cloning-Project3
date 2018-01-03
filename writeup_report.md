@@ -18,7 +18,7 @@ The goals / steps of this project are the following:
 [image3]:  examples/correction.jpg "Recovery Image"
 [image4]:  examples/backToCenter.jpg "Back to center"
 [image5]:  examples/nonFlipped.jpg "Original Image"
-[image6]:  examples/flipped.jpg "Flipped Image"
+[image7]:  examples/flipped.jpg "Flipped Image"
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.
@@ -125,7 +125,7 @@ Then I repeated this process on track two in order to get more data points.
 To augment the data sat, I also flipped images and angles thinking that this would correct for overfitting left turns because the track is a counterclockwise loop. For example, here is an image that has then been flipped:
 
 ![Original Image][image5]
-![Flipped Image][image6]
+![Flipped Image][image7]
 
 
 After the collection process, I had about 10k number of data points. I then preprocessed this data by normalizing it using a Keras lambda function and cropped the image by 70px (top) and 25px (bottom)
