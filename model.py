@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Dropout
-from keras.layers.convolutional import Cropping2D, Convolution2D
-import matplotlib.pyplot as plt
+from keras.layers.convolutional import Conv2D, Cropping2D
+# import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
@@ -29,16 +29,16 @@ def generator(samples, batch_size=BATCH_SIZE):
             measurements = []
 
             for batch_sample in batch_samples:
-                for imageAngle in range(3):
+                for imageCameraAngle in range(3):
                     measurement = float(batch_sample[3])
                     correction = 0.25
-                    if imageAngle == 1:
+                    if imageCameraAngle == 1:
                         # Apply correction to left image
                         measurement = measurement + correction
-                    if imageAngle == 2:
+                    if imageCameraAngle == 2:
                         # Apply correction to right image
                         measurement = measurement - correction
-                    source_path = batch_sample[imageAngle]
+                    source_path = batch_sample[imageCameraAngle]
                     filename = source_path.split('/')[-1]
                     current_path = '../Data/IMG/' + filename
                     image = cv2.imread(current_path)
@@ -60,28 +60,28 @@ validation_generator = generator(validation_image_samples, batch_size=BATCH_SIZE
 model = Sequential()
 model.add(Lambda(lambda x: x / 255 - 0.5, input_shape=(160, 320, 3), output_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((70, 25), (0, 0))))
-model.add(Convolution2D(24, 5, 5, subsample=(2, 2), activation="relu"))
-model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation="relu"))
-model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation="relu"))
-model.add(Convolution2D(64, 3, 3, activation="relu"))
-model.add(Convolution2D(64, 3, 3, activation="relu"))
+model.add(Conv2D(24, (5, 5), strides=(2, 2), activation="relu"))
+model.add(Conv2D(36, (5, 5), strides=(2, 2), activation="relu"))
+model.add(Conv2D(48, (3, 3), strides=(2, 2), activation="relu"))
+model.add(Conv2D(64, (3, 3), activation="relu"))
+model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(Flatten())
 model.add(Dropout(0.5))
-model.add(Dense(100))
-model.add(Dense(50))
+model.add(Dense(units=100))
+model.add(Dense(units=50))
 model.add(Dropout(0.5))
-model.add(Dense(10))
-model.add(Dense(1))
-print("Training images: {0}".format(len(train_image_samples)))
+model.add(Dense(units=10))
+model.add(Dense(units=1))
 model.compile(loss='mse', optimizer='adam')
+
 history_object = model.fit_generator(train_generator, samples_per_epoch=len(train_image_samples),
                                      validation_data=validation_generator,
-                                     nb_val_samples=len(validation_image_samples), nb_epoch=5, verbose=1)
+                                     validation_steps=len(validation_image_samples) / BATCH_SIZE, epochs=5, verbose=1)
 
 model.save('model.h5')
 
 ## print the keys contained in the history object
-#print(history_object.history.keys())
+# print(history_object.history.keys())
 
 ## plot the training and validation loss for each epoch
 # plt.plot(history_object.history['loss'])
